@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDP Theme Voting – RVCE 2026</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0c10;
+            --surface: #111318;
+            --card: #161a22;
+            --border: #252a35;
+            --accent: #f0c040;
+            --accent2: #3d8ef0;
+            --text: #e8eaf0;
+            --muted: #8892a4;
+            --success: #34d399;
+            --danger: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(61, 142, 240, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(61, 142, 240, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .anim {
+            animation: fadeUp 0.35s ease;
+        }
+
+        /* ── SHARED LAYOUT ── */
+        .wrap {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 44px 20px 60px;
+        }
+
+        .badge {
+            display: inline-flex;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 6px 18px;
+            font-size: 11px;
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 22px;
+        }
+
+        .badge span {
+            color: var(--accent);
+        }
+
+        /* ── HOME ── */
+        .home-center {
+            max-width: 540px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .big-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(52px, 11vw, 96px);
+            letter-spacing: 0.03em;
+            line-height: 0.85;
+            background: linear-gradient(135deg, #fff 20%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+        }
+
+        .home-sub {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.75;
+            margin-bottom: 36px;
+        }
+
+        .phase-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .slot-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .slot {
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .slot.done {
+            border-color: var(--success);
+        }
+
+        .slot.open {
+            border-color: var(--accent);
+            background: rgba(240, 192, 64, 0.05);
+        }
+
+        .slot-n {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            color: var(--muted);
+            width: 24px;
+            flex-shrink: 0;
+        }
+
+        .slot.done .slot-n {
+            color: var(--success);
+        }
+
+        .slot.open .slot-n {
+            color: var(--accent);
+        }
+
+        .slot-body {
+            flex: 1;
+        }
+
+        .slot-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .slot-meta {
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            margin-top: 2px;
+        }
+
+        .slot.done .slot-meta {
+            color: var(--success);
+        }
+
+        .name-input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .name-input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-go {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 20px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-go:hover {
+            background: #f5d060;
+        }
+
+        .btn-wide {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-accent2 {
+            background: transparent;
+            border: 1.5px solid var(--accent2);
+            color: var(--accent2);
+        }
+
+        .btn-accent2:hover {
+            background: rgba(61, 142, 240, 0.1);
+        }
+
+        .btn-accent2:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-ghost {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .btn-ghost:hover {
+            color: var(--text);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #000;
+        }
+
+        .btn-success:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .all-voted-note {
+            background: rgba(52, 211, 153, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: var(--success);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        /* ── VOTE SCREEN ── */
+        .vote-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .vote-header-info h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            letter-spacing: 0.05em;
+            line-height: 1;
+        }
+
+        .vote-header-info p {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .step-bar {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .step-pip {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .step-pip.on {
+            background: var(--accent);
+        }
+
+        .count-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 16px;
+        }
+
+        .count-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            letter-spacing: 0.05em;
+        }
+
+        .count-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .count-badge strong {
+            color: var(--accent);
+            font-size: 20px;
+        }
+
+        .alert {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            color: var(--danger);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.on {
+            display: block;
+        }
+
+        /* THEMES GRID */
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+            gap: 9px;
+            margin-bottom: 24px;
+        }
+
+        .tc {
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 11px;
+            padding: 14px 14px 14px 42px;
+            cursor: pointer;
+            transition: all 0.16s;
+            user-select: none;
+            position: relative;
+        }
+
+        .tc:hover {
+            border-color: #363c4a;
+            transform: translateY(-1px);
+        }
+
+        .tc.sel {
+            border-color: var(--accent);
+            background: rgba(240, 192, 64, 0.07);
+        }
+
+        .tc.dis {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .tc-chk {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            transition: all 0.16s;
+        }
+
+        .tc.sel .tc-chk {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #000;
+            font-weight: 900;
+        }
+
+        .tc-num {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 3px;
+        }
+
+        .tc-name {
+            font-weight: 600;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .tc.sel .tc-name {
+            color: var(--accent);
+        }
+
+        /* SUBTHEME CHIPS */
+        .sub-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+
+        .sc {
+            padding: 8px 16px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-size: 13px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .sc:hover {
+            border-color: #363c4a;
+            color: var(--text);
+        }
+
+        .sc.sel {
+            background: rgba(61, 142, 240, 0.15);
+            border-color: var(--accent2);
+            color: var(--accent2);
+            font-weight: 500;
+        }
+
+        .sc.dis {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ── REVEAL SCREEN ── */
+        .reveal-center {
+            text-align: center;
+        }
+
+        .reveal-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .winner-card {
+            background: linear-gradient(135deg, rgba(240, 192, 64, 0.14), rgba(61, 142, 240, 0.08));
+            border: 2px solid rgba(240, 192, 64, 0.5);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 20px 0;
+        }
+
+        .winner-num {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .winner-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(28px, 5vw, 48px);
+            letter-spacing: 0.04em;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .winner-votes {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .winner-votes strong {
+            color: var(--success);
+        }
+
+        .theme-bars {
+            margin: 28px 0;
+            text-align: left;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        .bar-lbl {
+            font-size: 12px;
+            color: var(--muted);
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bar-lbl.winner-lbl {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .bar-track {
+            width: 100px;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.7s cubic-bezier(.4, 0, .2, 1);
+            background: linear-gradient(90deg, var(--accent2), var(--accent));
+        }
+
+        .bar-val {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            width: 16px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* ── FINAL RESULTS ── */
+        .results-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .results-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(40px, 8vw, 72px);
+            letter-spacing: 0.03em;
+            line-height: 0.85;
+            background: linear-gradient(135deg, #fff, var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .live-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: 11px;
+            color: var(--success);
+            font-family: 'DM Mono', monospace;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        .voters-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 24px;
+        }
+
+        .vp {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 5px 13px;
+            font-size: 12px;
+        }
+
+        .vp.done {
+            border-color: var(--success);
+        }
+
+        .vp .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .vp.done .dot {
+            background: var(--success);
+        }
+
+        .vp .vn {
+            color: var(--muted);
+        }
+
+        .vp.done .vn {
+            color: var(--text);
+        }
+
+        .top-rec {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(61, 142, 240, 0.07));
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 14px;
+            padding: 22px 24px;
+            margin-bottom: 22px;
+        }
+
+        .top-rec-lbl {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--success);
+            letter-spacing: 0.15em;
+            margin-bottom: 6px;
+        }
+
+        .top-rec-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        .top-rec-sub {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+
+        .panel-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 17px;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .indiv-row {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .indiv-row:last-child {
+            border-bottom: none;
+        }
+
+        .indiv-name {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 7px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .tag {
+            padding: 3px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .tag-t {
+            background: rgba(240, 192, 64, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(240, 192, 64, 0.2);
+        }
+
+        .tag-s {
+            background: rgba(61, 142, 240, 0.1);
+            color: var(--accent2);
+            border: 1px solid rgba(61, 142, 240, 0.18);
+        }
+
+        .done-wrap {
+            max-width: 460px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 80px 24px;
+        }
+
+        .done-icon {
+            font-size: 56px;
+            margin-bottom: 18px;
+        }
+
+        .done-ttl {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 46px;
+            letter-spacing: 0.04em;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+
+        .done-sub {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ HOME ══ -->
+    <div class="screen active" id="s-home">
+        <div class="wrap anim">
+            <div class="home-center">
+                <div class="badge">RVCE &middot; <span>IDP XX367P</span> &middot; VI Sem 2026</div>
+                <div class="big-title">IDP<br>VOTE</div>
+                <p class="home-sub">Two rounds: first all 4 members pick their 7 preferred themes, then everyone votes
+                    on sub-themes from the winning theme.</p>
+
+                <div class="phase-label" id="home-phase-label">Phase 1 — Theme Voting</div>
+                <div class="slot-list" id="slot-list"></div>
+                <div id="home-actions"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ THEME VOTING ══ -->
+    <div class="screen" id="s-themes">
+        <div class="wrap anim">
+            <div class="vote-header">
+                <div class="avatar" id="th-avatar">?</div>
+                <div class="vote-header-info">
+                    <h2 id="th-name">Voter</h2>
+                    <p>Phase 1 &mdash; Pick your 7 preferred themes</p>
+                </div>
+                <div class="step-bar" id="th-stepbar"></div>
+            </div>
+            <div id="alert-t" class="alert">Please select exactly 7 themes to continue.</div>
+            <div class="count-row">
+                <div class="count-title">CHOOSE 7 THEMES</div>
+                <div class="count-badge">Selected: <strong id="t-cnt">0</strong>/7</div>
+            </div>
+            <div class="themes-grid" id="themes-grid"></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button class="btn-ghost btn-wide" style="max-width:130px" onclick="goHome()">Cancel</button>
+                <button class="btn-go" style="max-width:180px" onclick="submitThemes()">Submit &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ REVEAL WINNER ══ -->
+    <div class="screen" id="s-reveal">
+        <div class="wrap anim">
+            <div class="reveal-center">
+                <div class="badge">Phase 1 Complete &mdash; <span>Winner Revealed</span></div>
+                <div class="reveal-label">All 4 members voted &mdash; winning theme</div>
+                <div class="winner-card">
+                    <div class="winner-num" id="rev-num">THEME 01</div>
+                    <div class="winner-name" id="rev-name">Theme Name</div>
+                    <div class="winner-votes" id="rev-votes"><strong>4/4</strong> members selected this theme</div>
+                </div>
+                <div class="theme-bars" id="rev-bars"></div>
+                <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Now each member picks their <strong
+                        style="color:var(--text)">4 preferred sub-themes</strong> from this theme.</p>
+                <button class="btn-success btn-wide" onclick="startSubPhase()">Start Sub-Theme Voting &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SUB-THEME VOTING ══ -->
+    <div class="screen" id="s-subs">
+        <div class="wrap anim">
+            <div class="vote-header">
+                <div class="avatar" id="sub-avatar">?</div>
+                <div class="vote-header-info">
+                    <h2 id="sub-name">Voter</h2>
+                    <p id="sub-phase-p">Phase 2 &mdash; Pick 4 sub-themes from the winning theme</p>
+                </div>
+                <div class="step-bar" id="sub-stepbar"></div>
+            </div>
+            <div id="alert-s" class="alert">Please select exactly 4 sub-themes to submit.</div>
+            <div class="count-row">
+                <div class="count-title" id="sub-winning-title">CHOOSE 4 SUB-THEMES</div>
+                <div class="count-badge">Selected: <strong id="s-cnt">0</strong>/4</div>
+            </div>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:20px" id="sub-winning-label">From: <strong
+                    style="color:var(--accent)">Winning Theme</strong></p>
+            <div class="sub-chips" id="sub-chips"></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button class="btn-ghost btn-wide" style="max-width:130px" onclick="goHome()">Cancel</button>
+                <button class="btn-go" style="max-width:180px" onclick="submitSubs()">Submit &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ PHASE DONE ══ -->
+    <div class="screen" id="s-done">
+        <div class="wrap anim">
+            <div class="done-wrap">
+                <div class="done-icon">&#10003;</div>
+                <div class="done-ttl" id="done-title">VOTE CAST!</div>
+                <p class="done-sub" id="done-msg">Your vote has been recorded.</p>
+                <button class="btn-go" onclick="goHome()" style="margin-bottom:12px">Back to Home</button>
+                <br>
+                <button class="btn-accent2 btn-wide" onclick="goResults()">View Live Results &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ FINAL RESULTS ══ -->
+    <div class="screen" id="s-results">
+        <div class="wrap anim">
+            <div class="results-head">
+                <div class="results-title">LIVE<br>RESULTS</div>
+                <div class="live-pill">
+                    <div class="live-dot"></div>LIVE
+                </div>
+            </div>
+            <div class="voters-pills" id="r-pills"></div>
+            <div id="r-body"></div>
+            <button class="btn-ghost btn-wide" onclick="goHome()" style="margin-top:8px">&#8592; Home</button>
+        </div>
+    </div>
+
+    <script>
+        /* ───────── DATA ───────── */
+        const THEMES = [
+            { id: 1, name: 'Clean Air and Portable Water', subs: ['Advanced Clean Coal Technologies', 'Alternative Fuel-based Transportation', 'Novel Propulsion Technologies', 'Green Manufacturing', 'Intelligent Transportation System', 'Low-dust Construction Technologies', 'Real-time Dense Spatial Air Quality Monitoring', 'Real-time Aquifer Monitoring', 'Including Salinity Ingress', 'Instant Portable Water Quality Testing', 'Affordable Desalination Technology', 'Membrane-based Waste Water Treatment', 'Affordable De-silting of Water Bodies', 'Technology for Run-off Control', 'Scalable Point-of-Use Water Treatment Technology', 'Dew Harvesting', 'In-situ Water Purification in Pipeline', 'Self-Healing Pipelines'] },
+            { id: 2, name: 'Food and Nutritional Security', subs: ['Vertical Farming', 'Development of Perennial Cereal Crops', 'Conversion of Non-edible Plants into Food', 'Bio-fortification (Conventional and Genetic)', 'Genomics and Phenomics', 'Transgenic Crop Plants and Animals', 'Rapid Diagnostic Tools for Zoonotic Diseases', 'Technologies for Increasing Shelf-life of Perishable Foods', 'Electron Beam Food Irradiation', 'Oil to Powder Technologies for Food', 'High Value Nutraceuticals from Aquatic Organisms', 'Real-time Monitoring of Quality and Bio-traceability', 'Climate-smart Agriculture', 'Conversion of C3 Plants to C4 Plants', 'Nano Formulations of Pesticides and Fertilizers', 'Interactive Foods', 'Smart Foods', '3D Printing of Food', 'Exploiting Microgravity for Crop Cultivation'] },
+            { id: 3, name: 'Universal Healthcare & Public Hygiene', subs: ['New Vaccines for Multi Drug Resistant Diseases', 'm-Health', 'Body Fluid Markers for Lifestyle Diseases', 'Integration of ISM with Modern Science', 'Personalized Medicine', 'Regenerative Therapies', 'Synthetic Biology', '3D Printing (Organs and Prosthetics)', 'Novel Composite Materials for Prosthetics', 'Brain-Computer Interface for Assistive Devices', 'Implanted Sensor-based Drug Delivery', 'Nano-robots', 'Telemedicine and Tele-surgery', 'Optogenetics', 'Wearable Devices', 'Medical Textiles', 'Automated Alerting for Medical Emergencies', 'Affordable Dry Sanitation Toilets', 'Self-sterilizing Household Fittings'] },
+            { id: 4, name: '24x7 Energy', subs: ['Solar PV', 'Algal Energy', 'Nuclear Fusion', 'Fusion Fission Hybrid Reactor', 'Fast Breeder Reactors for Thorium', 'Supercritical Coal', 'Advanced Coal Cycles', 'Advanced Fossil Fuels Extraction Technologies', 'Shale Gas', 'Tight Gas', 'Gas Hydrate', 'Hydrogen Energy', 'Biorefineries', 'Hybrid Storage', 'Fuel Cell', 'Microbial Fuel Cell', 'DC Grids', 'Smart Grids', 'ICT Based Smart Monitoring Systems', 'Wireless Power Transmission', 'Green and Net Zero Energy Buildings', 'Smart Windows', 'Zero Energy Artificial Lighting', 'Micro-gasifier Cookstove', 'Brushless DC (BLDC) Motors'] },
+            { id: 5, name: 'Decent Habitat', subs: ['4D CAD for Optimizing Construction', 'Sensors Based Intelligent Operation of Buildings', 'Calamity and Fire-resistant Structures', 'Underwater Building via Mineral Accretion', 'Low-cost Desalination for Construction', '3D Printing of Houses', 'Bio-mimetic Construction', 'Anti-gravity Devices for Construction', 'Eco-friendly Filler Slab Roofing', 'Cement Free/Water Free Concrete', 'Novel Concrete (Flexible, Self-healing, Bio-concrete)', 'Novel Structural Materials (Liquid Granite, Transparent Alumina)', 'Local and Recyclable Construction Materials', 'Nanotechnology for Paints and Surface Coatings', 'Green and Net-Zero Energy Buildings', 'Artificial Lighting via Absorbed Energy', 'Touch Panel Walls and Smart Windows'] },
+            { id: 6, name: 'Quality Education & Livelihood', subs: ['Massively Online Open Courseware (MOOCs)', 'Gaming/Gamification', 'Interactive Remotely Controlled Laboratories', 'Personalised Virtual Teachers', '4G and 5G Communication', 'Immersive Virtual Reality', 'Brain Computer Interface and Machine Cognition', 'Wearable Devices', 'Digital Identity and Learning Analytics', 'Automated Evaluation and Assessment Systems', 'Digital Holography and 3D Imaging', 'Volumetric/3D Display', '3D Printing', 'Real Time Translation for Indian Languages'] },
+            { id: 7, name: 'Safe and Speedy Mobility', subs: ['Intelligent Transportation System', 'Alternate Fuel Based Transportation', 'Advanced Powertrain Technologies', 'Affordable Energy Storage for Fast Charging', 'Active Aerodynamics', 'Heat Recovery Systems', 'Intelligent Roads', 'Long Life Low Maintenance Roads', 'Self-Healing Roads', 'Fog Vision System for Road and Rail', 'Active and Passive Safety Technology', 'Magnetic Levitation Technology', 'Tilting Train Technology', 'Autonomous Vehicles', 'Novel Modes of Transport (Hyperloop)', 'Amphibian and Flying Vehicles', 'Biomimetics Design for Ship'] },
+            { id: 8, name: 'Public Safety & National Security', subs: ['Indigenous Security Layers for Computing', 'National Cyberspace Border Surveillance', 'Indigenous Secure Network Backbone', 'Equipment Control Security Technologies', 'Indigenous Biometric and Cyber Forensic Tech', 'Technologies to Secure Body Implants', 'Technologies Against Remote Mind Control', 'Advanced Systems for Pedestrian Safety', 'Rapid Sensing to Detect Chemicals', 'Sensors for Elderly and Persons with Disability', 'Frugal Fire Detection and Firefighting Devices', 'Advanced Fire and Smoke Detection in Trains', 'Sensors to Prevent Spread of Pandemics', 'Bioluminescent/Zero Energy Street Lighting', 'Detection Against CBRN Attacks', 'Efficient Crowd Management Systems'] },
+            { id: 9, name: 'Cultural Diversity and Vibrancy', subs: ['Advanced Computational Photographic Techniques', 'Digital Documentation on Open-source Platforms', '3D Imaging', 'Holography', 'Volumetric Display Devices', 'Immersive Virtual Reality', 'GIS Applications for Archaeology', 'Advanced Chemical Preservation of Heritage', 'Ground Penetration Radars for Monuments', 'Affordable Laser Cleaning of Metallic Surfaces', 'Affordable Portable Interpretation Devices', 'Natural Language Interpretation', 'Digitization and Real Time Translation'] },
+            { id: 10, name: 'Transparent & Effective Governance', subs: ['Safe, Secure National Database Vaults', 'Digitization and Storage of Public Records', 'Integrated Emergency Response', 'Location Independent Voting Facility', 'Networking of All Legal Documents', 'Advanced Forensics', 'Wearable Devices for Monitoring under Law', 'Digital Holography (Virtual Lawyers)', 'Real Time Translation', 'Advanced Biometrics for Digital Identity', 'Human Independent Decision Support Systems'] },
+            { id: 11, name: 'Disaster and Climate Resilience', subs: ['Early Warning for Natural and Manmade Disasters', 'Earthquake Prediction', 'Calamity Resistant Structures', 'Sensor Network for Rescue and Rehabilitation', 'All-terrain Integrated Rescue Vehicles', 'Accurate Micro-level Weather Forecast', 'Climate Smart Agriculture', 'Artificial Photosynthesis', 'Energy Efficient Electrical Equipment', 'Alternate Fuel Vehicles', 'Technology for Landfill Gas Recovery', 'Homeostatic Diamond Trees / Artificial Trees', 'Weather Modification Technologies'] },
+            { id: 12, name: 'Eco-Friendly Conservation of Natural Resources', subs: ['High Cellulose Stress Tolerant Forest Tree Species', 'Microbial Consortia for Enhancing Biomass Production', 'Sensor-based Forest Fire Mitigation', 'Forestry Species for Reclamation of Degraded Soil', 'Modeling Tree Water Relation Hydrology', 'National Land Morphology Mapping', 'Regeneration of Extinct Species for Biodiversity', 'Identifying and Eliminating Invasive Species', 'Satellite Telemetry for Species Movement', 'Species Distribution Knowledge and Modeling', 'Population Dynamics of Species Study', 'Measures to Mitigate Man-animal Conflict', 'Indigenous Knowledge for Ecosystem Protection', 'Green Mining', 'Microbial Enhanced Oil Recovery'] },
+        ];
+
+        /* ───────── STATE ───────── */
+        function loadState() {
+            try { const r = sessionStorage.getItem('idp2_state'); if (r) return JSON.parse(r); } catch (e) { }
+            return { phase: 1, themeVoters: [], subVoters: [], winnerThemeId: null };
+        }
+        function saveState() {
+            try { sessionStorage.setItem('idp2_state', JSON.stringify(state)); } catch (e) { }
+        }
+        let state = loadState();
+
+        // current in-progress vote (not yet committed)
+        let session = { name: '', themes: [], subs: [] };
+
+        /* ───────── ROUTING ───────── */
+        function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function goHome() { renderHome(); show('s-home'); }
+        function goResults() { renderResults(); show('s-results'); }
+
+        /* ───────── HOME ───────── */
+        function renderHome() {
+            const phase = state.phase;
+            const voters = phase === 1 ? state.themeVoters : state.subVoters;
+            const voted = voters.length;
+            const allDone = voted >= 4;
+
+            document.getElementById('home-phase-label').textContent =
+                phase === 1 ? 'Phase 1 — Theme Voting' : 'Phase 2 — Sub-Theme Voting';
+
+            // Slots
+            let html = voters.map((v, i) => `
+    <div class="slot done">
+      <div class="slot-n">${i + 1}</div>
+      <div class="slot-body">
+        <div class="slot-name">${esc(v.name)}</div>
+        <div class="slot-meta">&#10003; ${phase === 1 ? v.themes.length + ' themes selected' : v.subs.length + ' sub-themes selected'}</div>
+      </div>
+    </div>`).join('');
+
+            if (!allDone) {
+                html += `<div class="slot open">
+      <div class="slot-n">${voted + 1}</div>
+      <div class="slot-body">
+        <div class="slot-name">Next Voter</div>
+        <input class="name-input" id="nv-name" placeholder="Enter your name..." maxlength="30" onkeydown="if(event.key==='Enter')beginVote()"/>
+        <button class="btn-go" onclick="beginVote()">${phase === 1 ? 'Vote on Themes' : 'Vote on Sub-Themes'} &rarr;</button>
+      </div>
+    </div>`;
+            } else {
+                html += `<div class="slot" style="justify-content:center;padding:16px"><span style="color:var(--success);font-size:13px">&#10003; All 4 members voted</span></div>`;
+            }
+
+            document.getElementById('slot-list').innerHTML = html;
+
+            // Actions
+            let actions = `<button class="btn-accent2 btn-wide" onclick="goResults()" style="margin-bottom:10px">&#9654; View Live Results</button>`;
+            if (allDone && phase === 1) {
+                actions = `<div class="all-voted-note">All theme votes are in! Reveal the winning theme.</div>
+      <button class="btn-success btn-wide" onclick="revealWinner()" style="margin-bottom:10px">Reveal Winner &amp; Start Phase 2 &rarr;</button>` + actions;
+            }
+            document.getElementById('home-actions').innerHTML = actions;
+        }
+
+        function beginVote() {
+            const el = document.getElementById('nv-name');
+            const name = el ? el.value.trim() : '';
+            if (!name) { el && (el.style.borderColor = 'var(--danger)'); return; }
+            const voters = state.phase === 1 ? state.themeVoters : state.subVoters;
+            if (voters.find(v => v.name.toLowerCase() === name.toLowerCase())) { alert(`"${name}" has already voted in this phase!`); return; }
+
+            session = { name, themes: [], subs: [] };
+            if (state.phase === 1) startThemeVote();
+            else startSubVote();
+        }
+
+        /* ───────── PHASE 1: THEMES ───────── */
+        function startThemeVote() {
+            document.getElementById('th-avatar').textContent = session.name[0].toUpperCase();
+            document.getElementById('th-name').textContent = session.name;
+            renderStepBar('th-stepbar', state.themeVoters.length + 1, 4);
+            renderThemesGrid();
+            show('s-themes');
+        }
+
+        function renderThemesGrid() {
+            const sel = session.themes, maxed = sel.length >= 7;
+            document.getElementById('t-cnt').textContent = sel.length;
+            document.getElementById('themes-grid').innerHTML = THEMES.map(t => {
+                const s = sel.includes(t.id), d = !s && maxed;
+                return `<div class="tc${s ? ' sel' : ''}${d ? ' dis' : ''}" onclick="toggleTheme(${t.id})">
+      <div class="tc-chk">${s ? '&#10003;' : ''}</div>
+      <div class="tc-num">THEME ${String(t.id).padStart(2, '0')}</div>
+      <div class="tc-name">${t.name}</div>
+    </div>`;
+            }).join('');
+            document.getElementById('alert-t').classList.remove('on');
+        }
+
+        function toggleTheme(id) {
+            const i = session.themes.indexOf(id);
+            if (i >= 0) session.themes.splice(i, 1); else if (session.themes.length < 7) session.themes.push(id);
+            renderThemesGrid();
+        }
+
+        function submitThemes() {
+            if (session.themes.length !== 7) { document.getElementById('alert-t').classList.add('on'); return; }
+            state.themeVoters.push({ name: session.name, themes: [...session.themes] });
+            saveState();
+            const left = 4 - state.themeVoters.length;
+            document.getElementById('done-title').textContent = 'THEMES SAVED!';
+            document.getElementById('done-msg').textContent = left > 0
+                ? `${session.name}, your themes are saved! ${left} more member${left > 1 ? 's' : ''} still need to vote.`
+                : 'All 4 members have voted on themes! Go home to reveal the winner.';
+            show('s-done');
+        }
+
+        /* ───────── REVEAL WINNER ───────── */
+        function revealWinner() {
+            // Tally
+            const tc = {};
+            THEMES.forEach(t => tc[t.id] = 0);
+            state.themeVoters.forEach(v => v.themes.forEach(id => tc[id]++));
+            const sorted = Object.entries(tc).sort((a, b) => b[1] - a[1]);
+            const winnerId = parseInt(sorted[0][0]);
+            state.winnerThemeId = winnerId;
+            state.phase = 2;
+            saveState();
+
+            const winner = THEMES.find(t => t.id === winnerId);
+            document.getElementById('rev-num').textContent = `THEME ${String(winnerId).padStart(2, '0')}`;
+            document.getElementById('rev-name').textContent = winner.name;
+            document.getElementById('rev-votes').innerHTML = `<strong style="color:var(--success)">${sorted[0][1]}/4</strong> members selected this theme`;
+
+            const maxV = sorted[0][1] || 1;
+            document.getElementById('rev-bars').innerHTML = sorted.filter(x => x[1] > 0).map(([id, cnt]) => {
+                const t = THEMES.find(x => x.id == id);
+                const isW = parseInt(id) === winnerId;
+                return `<div class="bar-row">
+      <div class="bar-lbl${isW ? ' winner-lbl' : ''}">${isW ? '&#9733; ' : ''}${t.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(cnt / maxV) * 100}%${isW ? ';background:linear-gradient(90deg,var(--accent),#fff8)' : ''}"></div></div>
+      <div class="bar-val">${cnt}</div>
+    </div>`;
+            }).join('');
+
+            show('s-reveal');
+        }
+
+        function startSubPhase() { goHome(); }
+
+        /* ───────── PHASE 2: SUB-THEMES ───────── */
+        function startSubVote() {
+            const winner = THEMES.find(t => t.id === state.winnerThemeId);
+            document.getElementById('sub-avatar').textContent = session.name[0].toUpperCase();
+            document.getElementById('sub-name').textContent = session.name;
+            document.getElementById('sub-winning-title').textContent = 'CHOOSE 4 SUB-THEMES';
+            document.getElementById('sub-winning-label').innerHTML = `From: <strong style="color:var(--accent)">${winner.name}</strong>`;
+            document.getElementById('sub-phase-p').textContent = 'Phase 2 — Pick 4 sub-themes from the winning theme';
+            renderStepBar('sub-stepbar', state.subVoters.length + 1, 4);
+            renderSubChips();
+            show('s-subs');
+        }
+
+        function renderSubChips() {
+            const winner = THEMES.find(t => t.id === state.winnerThemeId);
+            const sel = session.subs, maxed = sel.length >= 4;
+            document.getElementById('s-cnt').textContent = sel.length;
+            document.getElementById('sub-chips').innerHTML = winner.subs.map(s => {
+                const isSel = sel.includes(s), isDis = !isSel && maxed;
+                return `<span class="sc${isSel ? ' sel' : ''}${isDis ? ' dis' : ''}" onclick="toggleSub('${s.replace(/'/g, "\\'")}')"> ${s}</span>`;
+            }).join('');
+            document.getElementById('alert-s').classList.remove('on');
+        }
+
+        function toggleSub(s) {
+            const i = session.subs.indexOf(s);
+            if (i >= 0) session.subs.splice(i, 1); else if (session.subs.length < 4) session.subs.push(s);
+            renderSubChips();
+        }
+
+        function submitSubs() {
+            if (session.subs.length !== 4) { document.getElementById('alert-s').classList.add('on'); return; }
+            state.subVoters.push({ name: session.name, subs: [...session.subs] });
+            saveState();
+            const left = 4 - state.subVoters.length;
+            document.getElementById('done-title').textContent = 'VOTE CAST!';
+            document.getElementById('done-msg').textContent = left > 0
+                ? `${session.name}, your sub-theme vote is saved! ${left} more member${left > 1 ? 's' : ''} to go.`
+                : 'All 4 sub-theme votes are in! Check the final results.';
+            show('s-done');
+        }
+
+        /* ───────── RESULTS ───────── */
+        function renderResults() {
+            const phase = state.phase;
+            const tVoters = state.themeVoters;
+            const sVoters = state.subVoters;
+
+            // Pills
+            const allVoters = [...new Set([...tVoters.map(v => v.name), ...sVoters.map(v => v.name)])];
+            document.getElementById('r-pills').innerHTML = allVoters.map(n =>
+                `<div class="vp done"><div class="dot"></div><div class="vn">${esc(n)}</div></div>`
+            ).join('') + (tVoters.length < 4 ? `<div class="vp"><div class="dot"></div><div class="vn" style="font-style:italic">${4 - tVoters.length} pending</div></div>` : '');
+
+            let body = '';
+
+            // ── Phase 1 results: theme tally
+            if (tVoters.length > 0) {
+                const tc = {};
+                THEMES.forEach(t => tc[t.id] = 0);
+                tVoters.forEach(v => v.themes.forEach(id => tc[id]++));
+                const sorted = Object.entries(tc).sort((a, b) => b[1] - a[1]);
+                const maxT = sorted[0][1] || 1;
+                const topId = parseInt(sorted[0][0]);
+                const topTheme = THEMES.find(t => t.id === topId);
+
+                body += `<div class="top-rec">
+      <div class="top-rec-lbl">&#9733; ${phase === 1 ? 'Leading' : 'Winning'} Theme</div>
+      <div class="top-rec-name">${topTheme.name}</div>
+      <div class="top-rec-sub">${sorted[0][1]} of ${tVoters.length} vote${tVoters.length > 1 ? 's' : ''} &mdash; ${phase === 1 ? 'so far' : 'confirmed winner'}</div>
+    </div>`;
+
+                body += `<div class="panel"><div class="panel-title">THEME VOTES (${tVoters.length}/4 voted)</div>`;
+                body += sorted.filter(x => x[1] > 0).map(([id, cnt]) => {
+                    const t = THEMES.find(x => x.id == id), isW = parseInt(id) === topId && phase === 2;
+                    return `<div class="bar-row">
+        <div class="bar-lbl${isW ? ' winner-lbl' : ''}">${isW ? '&#9733; ' : ''}${t.name}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(cnt / maxT) * 100}%"></div></div>
+        <div class="bar-val">${cnt}</div>
+      </div>`;
+                }).join('') + '</div>';
+            }
+
+            // ── Phase 2 results: sub-theme tally
+            if (sVoters.length > 0) {
+                const sc = {};
+                sVoters.forEach(v => v.subs.forEach(s => { sc[s] = (sc[s] || 0) + 1; }));
+                const sorted = Object.entries(sc).sort((a, b) => b[1] - a[1]);
+                const maxS = sorted[0][1] || 1;
+                const winner = THEMES.find(t => t.id === state.winnerThemeId);
+
+                body += `<div class="panel"><div class="panel-title">SUB-THEME VOTES from "${winner.name}" (${sVoters.length}/4 voted)</div>`;
+                body += sorted.map(([s, cnt]) => `<div class="bar-row">
+      <div class="bar-lbl">${s}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(cnt / maxS) * 100}%;background:linear-gradient(90deg,var(--success),var(--accent2))"></div></div>
+      <div class="bar-val">${cnt}</div>
+    </div>`).join('') + '</div>';
+            }
+
+            // ── Individual votes
+            if (tVoters.length > 0) {
+                body += `<div class="panel"><div class="panel-title">INDIVIDUAL VOTES</div>`;
+                body += tVoters.map(v => {
+                    const tnames = v.themes.map(id => THEMES.find(t => t.id == id).name);
+                    const sv = sVoters.find(x => x.name === v.name);
+                    return `<div class="indiv-row">
+        <div class="indiv-name">${esc(v.name)}</div>
+        <div class="tags">${tnames.map(n => `<span class="tag tag-t">${n}</span>`).join('')}</div>
+        ${sv ? `<div class="tags">${sv.subs.map(s => `<span class="tag tag-s">&#8627; ${s}</span>`).join('')}</div>` : ''}
+      </div>`;
+                }).join('') + '</div>';
+            }
+
+            if (!body) body = '<div style="text-align:center;padding:48px;color:var(--muted);font-size:14px">No votes yet. Be the first!</div>';
+            document.getElementById('r-body').innerHTML = body;
+        }
+
+        /* ───────── HELPERS ───────── */
+        function renderStepBar(elId, current, total) {
+            document.getElementById(elId).innerHTML = Array(total).fill(0).map((_, i) =>
+                `<div class="step-pip${i < current ? ' on' : ''}"></div>`).join('');
+        }
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function resetAll() { if (!confirm('Reset everything?')) return; state = { phase: 1, themeVoters: [], subVoters: [], winnerThemeId: null }; saveState(); goHome(); }
+
+        goHome();
+    </script>
+</body>
+
+</html>
